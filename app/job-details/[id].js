@@ -1,5 +1,5 @@
 import React from 'react';
-import {Text, View, SafeAreaView, ScrollView, ActivityIndicator, RefreshControl} from "react-native";
+import {Text, View, Share, Alert, SafeAreaView, ScrollView, ActivityIndicator, RefreshControl} from "react-native";
 import { Stack, useRouter, useSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Company, JobAbout, JobFooter, JobTabs, ScreenHeaderBtn, Specifics } from '../../components';
@@ -23,6 +23,7 @@ const JobDetails = () => {
         setRefreshing(false);
     }, [])
 
+    // ========= display content ==============
     const displayTabContent = () => {
         switch(activeTab) {
             case "Quatifications":
@@ -45,6 +46,28 @@ const JobDetails = () => {
         }
     }
 
+    // =============== on share ==================
+
+    const onShare = async () => {
+        try {
+          const result = await Share.share({
+            message: `Post - ${data[0].job_title} \n\n Company - ${data[0].employer_name} \n\n link - ${data[0]?.job_google_link ?? 'https://careers.google.com/jobs/results'}`,
+    
+          });
+          if (result.action === Share.sharedAction) {
+            if (result.activityType) {
+              // shared with activity type of result.activityType
+            } else {
+              // shared
+            }
+          } else if (result.action === Share.dismissedAction) {
+            // dismissed
+          }
+        } catch (error) {
+          Alert.alert(error.message);
+        }
+      };
+
   return (
     <SafeAreaView style={{flex:1, backgroundColor: COLORS.lightWhite}}>
         <Stack.Screen
@@ -63,6 +86,7 @@ const JobDetails = () => {
                     <ScreenHeaderBtn 
                         iconUrl={icons.share}
                         dimension="60%"
+                        handlePress={onShare}
                     />
                 ),
                 headerTitle: ""
